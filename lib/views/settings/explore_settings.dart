@@ -27,26 +27,42 @@ Widget buildExploreSettings(BuildContext context, bool popUp) {
                 ))),
         trailing: const Icon(Icons.arrow_right),
       ),
-      ListTile(
-        leading: const Icon(Icons.article_outlined),
-        title: Text("初始页面".tl),
-        trailing: Select(
-          initialValue: int.parse(appdata.settings[23]),
-          whenChange: (i) {
-            appdata.settings[23] = i.toString();
-            appdata.updateSettings();
-          },
-          values: ["我".tl, "收藏".tl, "探索".tl, "分类".tl],
-          inPopUpWidget: popUp,
+      StatefulBuilder(builder: (context, setState) {
+        return Column(children: [ListTile(
+          leading: const Icon(Icons.article_outlined),
+          title: Text("初始页面".tl),
+          trailing: Select(
+            initialValue: int.parse(appdata.settings[23]),
+            whenChange: (i) {
+              appdata.settings[23] = i.toString();
+              appdata.updateSettings();
+            },
+            values: [
+                  if (appdata.settings[67][0] == "1") "我".tl,
+                  if (appdata.settings[67][1] == "1") "收藏".tl,
+                  if (appdata.settings[67][2] == "1") "探索".tl,
+                  if (appdata.settings[67][3] == "1") "分类".tl
+                ],
+                inPopUpWidget: popUp,
+              ),
+        ),ListTile(
+          leading:
+          const Icon(Icons.source),
+          title: Text("漫画源(非探索页面)".tl),
+          trailing: const Icon(Icons.arrow_right),
+          onTap: () => setComicSource(context),
         ),
-      ),
-      ListTile(
-        leading:
-            const Icon(Icons.source),
-        title: Text("漫画源(非探索页面)".tl),
-        trailing: const Icon(Icons.arrow_right),
-        onTap: () => setComicSource(context),
-      ),
+          ListTile(
+            leading:
+            const Icon(Icons.navigation),
+            title: Text("导航栏".tl),
+            trailing: const Icon(Icons.arrow_right),
+            onTap: (){
+              setNavigation(context, setState);
+            },
+          ),],);
+
+      }),
       ListTile(
         leading:
             const Icon(Icons.pages),

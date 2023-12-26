@@ -17,6 +17,7 @@ import '../../network/http_client.dart';
 import 'package:pica_comic/views/widgets/show_message.dart';
 import 'package:flutter/material.dart';
 import 'package:pica_comic/base.dart';
+import '../main_page.dart';
 import '../widgets/value_listenable_widget.dart';
 import 'package:pica_comic/tools/translations.dart';
 
@@ -192,6 +193,88 @@ class CalculateCacheLogic extends StateController {
   }
 }
 
+void setNavigation(BuildContext context, setState) {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: Text("设置导航栏".tl),
+          children: [
+            const SizedBox(
+              width: 400,
+            ),
+            NavigationSetting(whenChange: (){
+              setState(()=>{});
+            }),
+          ],
+        );
+      });
+}
+
+class NavigationSetting extends StatefulWidget {
+  const NavigationSetting({Key? key, required this.whenChange,}) : super(key: key);
+  ///发生改变时的回调
+  final void Function() whenChange;
+  @override
+  State<NavigationSetting> createState() => _NavigationSettingState();
+}
+
+class _NavigationSettingState extends State<NavigationSetting> {
+  String? savedNavigation;
+  @override
+  void dispose() {
+    int curSelected = int.parse(appdata.settings[23]);
+    int trueSelected = 0;
+    final result = appdata.settings[67].split('');
+    // 如果之前选中的默认页面当前未选中, 那就改成第一个
+    if(appdata.settings[67][curSelected] != "1"){
+      appdata.settings[23] = '0';
+    }else{
+      // 如果之前选中的默认页面当前选中了, 就按照现有的导航更新默认导航
+      for(int i = 0; i < result.length; i++){
+        if(result[i] == '1'){
+          curSelected
+        }
+      }
+    }
+    appdata.updateSettings();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      try {
+        widget.whenChange();
+        MainPage.update();
+      } catch (e) {
+        //如果在test_network_page进行此操作将产生错误
+      }
+    });
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var titles = ["我".tl, "收藏夹".tl, "探索".tl, "分类".tl];
+    savedNavigation = appdata.settings[67];
+    return SizedBox(
+      child: Column(
+        children: [
+          for (int i = 0; i < 4; i++)
+            CheckboxListTile(
+              value: appdata.settings[67][i] == "1",
+              onChanged: (b) {
+                setState(() {
+                  if (b!) {
+                    appdata.settings[67] = appdata.settings[67].replaceRange(i, i + 1, '1');
+                  } else {
+                    appdata.settings[67] = appdata.settings[67].replaceRange(i, i + 1, '0');
+                  }
+                });
+              },
+              title: Text(titles[i]),
+            ),
+        ],
+      ),
+    );
+  }
+}
 
 void setComicSource(BuildContext context) {
   showDialog(

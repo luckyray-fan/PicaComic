@@ -30,10 +30,12 @@ class Select extends StatefulWidget {
 
 class _SelectState extends State<Select> {
   late int? value = widget.initialValue;
-
+  late int? savedInitialValue = widget.initialValue;
   @override
   Widget build(BuildContext context) {
     if(value != null && value! < 0) value = null;
+    // 如果 value 超出了当前可选的长度, 默认置为第一个
+    if(value != null && value! >= widget.values.length) value = 0;
     return InkWell(
       borderRadius: BorderRadius.circular(8),
       onTap: (){

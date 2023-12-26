@@ -37,6 +37,7 @@ class Destination {
   final Widget icon;
   final Widget selectedIcon;
 }
+class MainPageLogic extends StateController {}
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -50,7 +51,9 @@ class MainPage extends StatefulWidget {
     }
     App.to(navigatorKey!.currentContext!, widget);
   }
-
+  static void update() {
+    _MainPageState().setState(() {});
+  }
   static canPop() =>
       Navigator.of(navigatorKey?.currentContext ?? App.globalContext!).canPop();
 
@@ -81,12 +84,7 @@ class _MainPageState extends State<MainPage> {
         MainPage.navigatorKey!.currentContext!, (route) => route.isFirst);
   }
 
-  final pages = [
-    const MePage(),
-    const LocalFavoritesPage(),
-    const ExplorePageWithGetControl(),
-    const CategoryPageWithGetControl(),
-  ];
+  var pages = [];
 
   void login() {
     network.updateProfile().then((res) {
@@ -252,8 +250,22 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    var titles = ["我".tl, "收藏夹".tl, "探索".tl, "分类".tl];
-
+    var titles = [
+      if (appdata.settings[67][0] == "1") "我".tl,
+      if (appdata.settings[67][1] == "1") "收藏夹".tl,
+      if (appdata.settings[67][2] == "1") "探索".tl,
+      if (appdata.settings[67][3] == "1") "分类".tl
+    ];
+    pages = [
+      if (appdata.settings[67][0] == "1")
+        const MePage(),
+      if (appdata.settings[67][1] == "1")
+        const LocalFavoritesPage(),
+      if (appdata.settings[67][2] == "1")
+        const ExplorePageWithGetControl(),
+      if (appdata.settings[67][3] == "1")
+        const CategoryPageWithGetControl(),
+    ];
     return Material(
       child: CustomWillPopScope(
         action: () {
@@ -289,7 +301,7 @@ class _MainPageState extends State<MainPage> {
                             children: [
                               if (UiMode.m1(context))
                                 AppBar(
-                                  title: Text(titles[i]),
+                                  title: Text(titles[i < titles.length ? i: 0]),
                                   notificationPredicate: (notifications) =>
                                       notifications.context?.widget is MePage,
                                   actions: [
@@ -311,7 +323,7 @@ class _MainPageState extends State<MainPage> {
                                 ),
                               Expanded(
                                 child: AnimatedMainPage(
-                                  pages[i],
+                                  pages[i < pages.length ? i: 0],
                                   key: Key(i.toString()),
                                 ),
                               ),
@@ -324,28 +336,32 @@ class _MainPageState extends State<MainPage> {
                                   },
                                   selectedIndex: i,
                                   destinations: <NavigationItemData>[
-                                    NavigationItemData(
-                                      icon: const Icon(Icons.person_outlined),
-                                      selectedIcon: const Icon(Icons.person),
-                                      label: '我'.tl,
-                                    ),
-                                    NavigationItemData(
-                                      icon: const Icon(Icons.local_activity_outlined),
-                                      selectedIcon: const Icon(Icons.local_activity),
-                                      label: '收藏'.tl,
-                                    ),
-                                    NavigationItemData(
-                                      icon: const Icon(Icons.explore_outlined),
-                                      selectedIcon: const Icon(Icons.explore),
-                                      label: '探索'.tl,
-                                    ),
-                                    NavigationItemData(
-                                      icon: const Icon(
-                                          Icons.account_tree_outlined),
-                                      selectedIcon:
-                                          const Icon(Icons.account_tree),
-                                      label: '分类'.tl,
-                                    ),
+                                    if (appdata.settings[67][0] == "1")
+                                      NavigationItemData(
+                                        icon: const Icon(Icons.person_outlined),
+                                        selectedIcon: const Icon(Icons.person),
+                                        label: '我'.tl,
+                                      ),
+                                    if (appdata.settings[67][1] == "1")
+                                      NavigationItemData(
+                                        icon: const Icon(Icons.local_activity_outlined),
+                                        selectedIcon: const Icon(Icons.local_activity),
+                                        label: '收藏'.tl,
+                                      ),
+                                    if (appdata.settings[67][2] == "1")
+                                      NavigationItemData(
+                                        icon: const Icon(Icons.explore_outlined),
+                                        selectedIcon: const Icon(Icons.explore),
+                                        label: '探索'.tl,
+                                      ),
+                                    if (appdata.settings[67][3] == "1")
+                                      NavigationItemData(
+                                        icon: const Icon(
+                                            Icons.account_tree_outlined),
+                                        selectedIcon:
+                                            const Icon(Icons.account_tree),
+                                        label: '分类'.tl,
+                                      ),
                                   ],
                                 )
                             ],
